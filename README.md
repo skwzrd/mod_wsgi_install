@@ -1,4 +1,4 @@
-# Hosting A Dynamically Generated Site with Apache on Ubuntu Using mod_wsgi
+# A Guide To Hosting A mod_wsgi/Python Site on Ubuntu
 
 ## Introduction
 
@@ -85,7 +85,7 @@ At this point, when you visit [bionicbeaver.com](bionicbeaver.com) in your brows
 
 - [How To Set Up Apache Virtual Hosts on Ubuntu 20.04](https://www.digitalocean.com/community/tutorials/how-to-set-up-apache-virtual-hosts-on-ubuntu-20-04)
 
-## Part Two - Serving dynamically generated content using mod_wsgi/Python
+## Part Two - Serving content using mod_wsgi/Python
 
 `sudo apt-get install apache2-dev python3-dev  python3-distutils`
 
