@@ -1,4 +1,4 @@
-# Hosting A Dynamically Generate Site with Apache on Ubuntu Using mod_wsgi
+# Hosting A Dynamically Generated Site with Apache on Ubuntu Using mod_wsgi
 
 ## Introduction
 
@@ -10,9 +10,7 @@ For this guide, I am using
 
 In the following instructions, replace `bionicbeaver` with your own domain name.
 
-## Part One
-
-### Serving a static HTML file locally.
+## Part One - Serving a static HTML file locally
 
 Go to Wired Settings, select IPV4, set the IPV4 Method to `Manual` and enter in your desired IP address (192.168.0.##), your netmask (255.255.255.0 will work) and your gateway IP address (found on your router labeled as "web address").
 
@@ -87,9 +85,7 @@ At this point, when you visit [bionicbeaver.com](bionicbeaver.com) in your brows
 
 - [How To Set Up Apache Virtual Hosts on Ubuntu 20.04](https://www.digitalocean.com/community/tutorials/how-to-set-up-apache-virtual-hosts-on-ubuntu-20-04)
 
-## Part Two
-
-### Serving Dynamic Content with WSGI/Python
+## Part Two - Serving dynamically generated content using mod_wsgi/Python
 
 `sudo apt-get install apache2-dev python3-dev  python3-distutils`
 
