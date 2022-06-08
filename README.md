@@ -10,8 +10,6 @@ For this guide, I am using
 
 In the following instructions, replace `bionicbeaver` with your own domain name.
 
-At the end of this guide, you will have a site accessible 
-
 ## Part One
 
 ### Serving a static HTML file locally.
