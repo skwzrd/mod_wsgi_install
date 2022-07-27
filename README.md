@@ -105,7 +105,7 @@ Add the line `LoadModule wsgi_module /usr/lib/apache2/modules/mod_wsgi.so` to `/
 
 `sudo a2enmod wsgi`
 
-`sudo mkdir /usr/local/www/wsgi-scripts/bionicbeaver`
+`sudo mkdir -p /usr/local/www/wsgi-scripts/bionicbeaver`
 
 Create a file called `/usr/local/www/wsgi-scripts/bionicbeaver/bionicbeaver.py` and enter the following contents:
 
@@ -140,3 +140,13 @@ If you visit [bionicbeaver.com](bionicbeaver.com), you should now see the dynami
 
 - [Quick Installation Guide](https://modwsgi.readthedocs.io/en/master/user-guides/quick-installation-guide.html)
 - [apache - wsgi - python - basic example](https://stackoverflow.com/a/41827304/9576988)
+
+## Part Three - SSL Certificates
+
+`sudo snap install core; sudo snap refresh core`
+
+`sudo apt-get remove certbot`
+
+`sudo snap install --classic certbot`
+
+`sudo ln -s /snap/bin/certbot /usr/bin/certbot`
