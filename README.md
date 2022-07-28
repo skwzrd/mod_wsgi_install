@@ -16,7 +16,7 @@ Go to Wired Settings, select IPV4, set the IPV4 Method to `Manual` and enter in 
 
 **Note**: You can find your current IP address using `hostname -I`.
 
-Open a browser, visit your router's web address, and make a DHCP Reservation for your computer in order to give it a static IP address.
+Open a browser, visit your router's web address, and make a DHCP Reservation for your computer in order to give it a static IP address. While you're at it, if you want your site to be available to the internet, you can set up port forwarding in this step too. Add one rule for http and another for https.
 
 `sudo apt update`
 
@@ -151,6 +151,29 @@ If you visit [bionicbeaver.com](bionicbeaver.com), you should now see the dynami
 
 `sudo ln -s /snap/bin/certbot /usr/bin/certbot`
 
+`sudo certbot certonly --apache`
+
+Put the certificate and the private key in your *:443 virtual host like so,
+
+```
+SSLEngine on
+SSLCertificateFile /etc/letsencrypt/live/bionicbeaver.com/cert.pem
+SSLCertificateKeyFile /etc/letsencrypt/live/bionicbeaver.com/privkey.pem
+```
+
+Then test to see if auto-updating certs with certbot is working
+
+`sudo certbot renew --dry-run`
+
+Lastly, restart Apache
+
+`systemctl restart apache2`
+
 **References**:
 
 - [certbot](https://certbot.eff.org/instructions?ws=apache&os=ubuntufocal)
+
+
+## Final Notes
+
+Your site might not be available internally via your domain name or ip address. Instead, use `https://localhost`. External access will be possible.
