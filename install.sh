@@ -18,6 +18,10 @@ a2dissite 000-default.conf
 a2ensite "$host_domain.conf"
 a2enmod wsgi ssl rewrite
 
+sudo apt install ufw
+sudo ufw enable
+sudo ufw allow 'Apache Full'
+
 # # For serving static html pages instead of dynamic python pages
 # rm /var/www/html/index.html
 # mkdir -p "/var/www/html/$host_domain"
