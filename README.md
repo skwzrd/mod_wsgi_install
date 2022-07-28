@@ -1,179 +1,28 @@
-# A Guide To Hosting A mod_wsgi/Python Site on Ubuntu
+# Installing mod_wsgi on Ubuntu
 
-## Introduction
 
-For this guide, I am using
+## Requirements
 
 - Ubuntu 22.04
 - Apache/2.4.52
 - Python 3.10.4
 
-In the following instructions, replace `bionicbeaver` with your own domain name.
 
-## Part One - Serving a static HTML file locally
+## Manual Steps
 
-Go to Wired Settings, select IPV4, set the IPV4 Method to `Manual` and enter in your desired IP address (192.168.0.##), your netmask (255.255.255.0 will work) and your gateway IP address (found on your router labeled as "web address").
+1. Visit your router's webapp, go to Wired Settings, select IPV4, set the IPV4 Method to Manual and enter in your desired IP address (192.168.0.## - use `hostname -I` if you're unsure what ## should be), your netmask (255.255.255.0) and your gateway IP address (found on your router, labeled as "web address").
 
-**Note**: You can find your current IP address using `hostname -I`.
+2. Make a DHCP Reservation for your computer in order to give it a static local IP address.
 
-Open a browser, visit your router's web address, and make a DHCP Reservation for your computer in order to give it a static IP address. While you're at it, if you want your site to be available to the internet, you can set up port forwarding in this step too. Add one rule for http and another for https.
+3. Set up port forwarding in this step too. Add one rule for http (port 80) and another for https (port 443).
 
-`sudo apt update`
+4. If you don't have a domain name, register one at no-ip.com.
 
-`sudo apt install apache2`
+5. Configure, then run `install.sh`. By running this, you will end up with an Apache instance listing on ports 80 and 443. Redirecting to HTTPS is enabled, and Python content will be served.
 
-Add the following lines to the file `/etc/hosts` mapping your IP address to your domain name.
 
-```conf
-192.168.0.XX www.bionicbeaver.com
-192.168.0.XX bionicbeaver.com
-```
+## Notes
 
-`cd /etc/apache2/sites-available`
+Your site might not be available internally via your domain name or ip address. Instead, use https://localhost. External access will be possible.
 
-Create a file called `/etc/apache2/sites-available/bionicbeaver.com.conf` with the following contents:
-
-```conf
-<VirtualHost *:80>
-
-  ServerName  www.bionicbeaver.com
-  ServerAlias bionicbeaver.com  *.bionicbeaver.com
-  ServerAdmin bionicbeaver@bionicbeaver.com
-
-  DocumentRoot /var/www/html/bionicbeaver
-
-  ErrorLog ${APACHE_LOG_DIR}/error.log
-  CustomLog ${APACHE_LOG_DIR}/access.log combined
-
-</VirtualHost>
-```
-
-`sudo a2dissite 000-default.conf`
-
-`sudo a2ensite bionicbeaver.com.conf`
-
-`sudo rm /var/www/html/index.html`
-
-`sudo mkdir -p /var/www/html/bionicbeaver.com`
-
-`sudo chown -R $USER:$USER /var/www/html/bionicbeaver.com`
-
-`sudo chmod -R 755 /var/www`
-
-
-Make a file `/var/www/html/bionicbeaver/index.html` with the contents:
-
-```html
-<html>
-  <head>
-    <title>Welcome to bionicbeaver.com!</title>
-  </head>
-  <body>
-    <h1>Success!</h1>
-    <p>The bionicbeaver.com virtual host is working!</p>
-  </body>
-</html>
-```
-
-`sudo apache2ctl configtest`
-
-`systemctl restart apache2`
-
-At this point, when you visit [bionicbeaver.com](bionicbeaver.com) in your browser, you should see the page from `var/www/html/bionicbeaver/index.html`.
-
-**References**:
-
-- [How To Set Up Apache Virtual Hosts on Ubuntu 20.04](https://www.digitalocean.com/community/tutorials/how-to-set-up-apache-virtual-hosts-on-ubuntu-20-04)
-
-## Part Two - Serving content using mod_wsgi/Python
-
-`sudo apt-get install apache2-dev python3-dev  python3-distutils`
-
-Download mod_wsgi from [here](https://github.com/GrahamDumpleton/mod_wsgi/releases).
-
-`tar xvfz mod_wsgi-X.Y.tar.gz`
-
-`cd mod_wsgi-X.Y`
-
-`./configure --with-python=/usr/bin/python3`
-
-`make`
-
-`sudo make install`
-
-Add the line `LoadModule wsgi_module /usr/lib/apache2/modules/mod_wsgi.so` to `/etc/apache2/mods-available/wsgi.load` if it doesn't exist.
-
-`sudo a2enmod wsgi`
-
-`sudo mkdir -p /usr/local/www/wsgi-scripts/bionicbeaver`
-
-Create a file called `/usr/local/www/wsgi-scripts/bionicbeaver/bionicbeaver.py` and enter the following contents:
-
-```python
-def application(environ, start_response):
-    status = '200 OK'
-    output = b'Hello from bionicbeaver\'s dynamic page!'
-
-    response_headers = [
-        ('Content-type', 'text/plain'),
-        ('Content-Length', str(len(output)))
-    ]
-    start_response(status, response_headers)
-
-    return [output]
-```
-
-Add the following to the very bottom of `/etc/apache2/sites-available/bionicbeaver.com.conf`.
-
-```conf
-WSGIScriptAlias / /usr/local/www/wsgi-scripts/bionicbeaver/bionicbeaver.py
-<Directory /usr/local/www/wsgi-scripts/bionicbeaver>
-    Require all granted
-</Directory>
-```
-
-`systemctl restart apache2`
-
-If you visit [bionicbeaver.com](bionicbeaver.com), you should now see the dynamic page generated by mod_wsgi/Python.
-
-**References**:
-
-- [Quick Installation Guide](https://modwsgi.readthedocs.io/en/master/user-guides/quick-installation-guide.html)
-- [apache - wsgi - python - basic example](https://stackoverflow.com/a/41827304/9576988)
-
-## Part Three - SSL Certificates
-
-`sudo snap install core; sudo snap refresh core`
-
-`sudo apt-get remove certbot`
-
-`sudo snap install --classic certbot`
-
-`sudo ln -s /snap/bin/certbot /usr/bin/certbot`
-
-`sudo certbot certonly --apache`
-
-Put the certificate and the private key in your *:443 virtual host like so,
-
-```
-SSLEngine on
-SSLCertificateFile /etc/letsencrypt/live/bionicbeaver.com/cert.pem
-SSLCertificateKeyFile /etc/letsencrypt/live/bionicbeaver.com/privkey.pem
-```
-
-Then test to see if auto-updating certs with certbot is working
-
-`sudo certbot renew --dry-run`
-
-Lastly, restart Apache
-
-`systemctl restart apache2`
-
-**References**:
-
-- [certbot](https://certbot.eff.org/instructions?ws=apache&os=ubuntufocal)
-
-
-## Final Notes
-
-Your site might not be available internally via your domain name or ip address. Instead, use `https://localhost`. External access will be possible.
+I am not responsible for any of the undesired effects or results this code produces should you run it.
